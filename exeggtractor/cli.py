@@ -6,6 +6,7 @@ import json
 import cv2
 
 from .extract import extract_data_from_image
+from .scrub import scrub_team_data
 
 
 def main():
@@ -35,6 +36,8 @@ def main():
         print(result.error)
     else:
         print(json.dumps(result.team))
+        scrubbed_team = scrub_team_data(result.team)
+        print(json.dumps(scrubbed_team))
 
     os.makedirs("temp/", exist_ok=True)
     for image in result.debug_images:
