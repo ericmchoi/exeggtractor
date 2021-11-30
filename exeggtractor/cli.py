@@ -1,6 +1,7 @@
 import logging
 import os
 from argparse import ArgumentParser
+import json
 
 import cv2
 
@@ -33,7 +34,7 @@ def main():
     if result.error:
         print(result.error)
     else:
-        print(result.raw["id"], result.team["id"])
+        print(json.dumps(result.team))
 
     os.makedirs("temp/", exist_ok=True)
     for image in result.debug_images:

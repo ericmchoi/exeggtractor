@@ -1,5 +1,4 @@
 import logging
-import re
 from dataclasses import dataclass
 from enum import Enum
 
@@ -74,7 +73,6 @@ class DebugImage:
 @dataclass
 class Result:
     debug_images: list[DebugImage]
-    raw: dict = None
     team: dict = None
     error: str = None
 
@@ -175,17 +173,6 @@ def _extract_text(image):
     return raw
 
 
-def _parse_id(raw):
-    team_id = ""
-    match = re.match(r"Team ID (?P<team_id>\w{4} \w{4} \w{4} \w{2})", raw)
-
-    if match:
-        team_id = match.group("team_id").replace(" ", "")
-        team_id = team_id.translate(str.maketrans("oOlIZ", "00112"))
-
-    return team_id
-
-
 def _get_pokemon_info_contour(movelist_contour):
     """Return the pokemon info contour adjacent to the given movelist contour"""
     points = order_points(movelist_contour)
@@ -225,7 +212,32 @@ def _extract_pokemon_info(pokemon_info_image):
         lines.append(
             image_to_string(cropped_line, config=TESSERACT_CONFIG).strip())
 
-    return lines
+    return lines[0], lines[1], lines[2]
+
+
+def _prepare_movelist_image(screen, movelist_contour):
+    crop = crop_fixed_perspective(screen, movelist_contour)
+    height, width = crop.shape[:2]
+    crop = crop[0:height, int(0.16 * width):width]
+
+    gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+    mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+
+    return mask
+
+
+def _extract_movelist(movelist_image):
+    height, width = movelist_image.shape[:2]
+    line_height = height // 4
+
+    movelist = []
+    for i in range(4):
+        cropped_line = movelist_image[i*line_height:(i+1)*line_height, 0:width]
+        move = image_to_string(cropped_line, config=TESSERACT_CONFIG).strip()
+        if move:
+            movelist.append(move)
+
+    return movelist
 
 
 def extract_data_from_image(image: Image):
@@ -295,28 +307,35 @@ def extract_data_from_image(image: Image):
     team_id_image = _prepare_id_image(screen, id_contours[0])
     debug_images.append(DebugImage("team-id", team_id_image))
 
-    raw_id = _extract_text(team_id_image)
-    logger.info("Extracted Team ID: %s", raw_id)
-    team_id = _parse_id(raw_id)
+    team_id = _extract_text(team_id_image)
+    logger.info("Extracted Team ID: %s", team_id)
 
-    raw = {"id": raw_id, "pokemon": []}
     team = {"id": team_id, "pokemon": []}
 
     movelist_contours.sort(key=lambda m: m[0][0][0] + 10 * m[0][0][1])
 
     for i, movelist_contour in enumerate(movelist_contours):
-        logger.info("%ith Pokemon:", i+1)
+        logger.info("Extracting %ith Pokemon:", i+1)
         pokemon_info_contour = _get_pokemon_info_contour(movelist_contour)
         pokemon_info_image = _prepare_pokemon_info_image(
             screen, pokemon_info_contour)
-
         debug_images.append(DebugImage(f"{i}-info", pokemon_info_image))
+        species, ability, item = _extract_pokemon_info(pokemon_info_image)
 
-        raw_species, raw_ability, raw_item = _extract_pokemon_info(
-            pokemon_info_image)
+        logger.info("Extracted species text: %s", species)
+        logger.info("Extracted ability text: %s", ability)
+        logger.info("Extracted item text: %s", item)
 
-        logger.info("Extracted species text: %s", raw_species)
-        logger.info("Extracted ability text: %s", raw_ability)
-        logger.info("Extracted item text: %s", raw_item)
+        movelist_image = _prepare_movelist_image(screen, movelist_contour)
+        debug_images.append(DebugImage(f"{i}-movelist", movelist_image))
+        movelist = _extract_movelist(movelist_image)
 
-    return Result(debug_images, raw, team)
+        for move in movelist:
+            logger.info("Extracted move: %s", move)
+
+        pokemon = {"species": species, "ability": ability,
+                   "item": item, "movelist": movelist}
+
+        team["pokemon"].append(pokemon)
+
+    return Result(debug_images, team)
