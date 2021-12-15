@@ -1,12 +1,17 @@
+""" extract.py - Pokemon Sword/Shield rental team data extracting
+
+This module contains the code for extract_data_from_image which takes a
+screenshot from the game Pokemon Sword/Shield showing a rental team, and
+extracts relevant text data from it.
+"""
 import logging
-from dataclasses import dataclass
-from enum import Enum
 
 import cv2
 import numpy as np
 from colour import delta_E
 from pytesseract import image_to_string
 
+from .models import DebugImage, Image, ImageType, Pokemon, Result, Team
 from .utils import crop_fixed_perspective, order_points
 
 TESSERACT_CONFIG = r"--psm 7 -c page_separator=''"
@@ -53,31 +58,11 @@ CORNER_TESTS = [
     }
 ]
 
-Image = np.ndarray
-
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
-class ImageType(str, Enum):
-    SCREENSHOT = 'screenshot'
-    PHOTO = 'photo'
-
-
-@dataclass
-class DebugImage:
-    name: str
-    image: Image
-
-
-@dataclass
-class Result:
-    debug_images: list[DebugImage]
-    team: dict = None
-    error: str = None
-
-
-def _get_image_type(image: Image):
+def _get_image_type(image):
     if image.shape[0:2] not in [(720, 1280), (1080, 1920)]:
         return ImageType.PHOTO
 
@@ -167,14 +152,12 @@ def _prepare_id_image(screen, id_cnt):
 
 
 def _extract_text(image):
-    """Extract a team ID from the image"""
     raw = image_to_string(image, config=TESSERACT_CONFIG).strip()
 
     return raw
 
 
 def _get_pokemon_info_contour(movelist_contour):
-    """Return the pokemon info contour adjacent to the given movelist contour"""
     points = order_points(movelist_contour)
     top_left = points[0] - 1.07 * (points[1] - points[0])
     bottom_left = points[3] - 1.07 * (points[2] - points[3])
@@ -241,6 +224,17 @@ def _extract_movelist(movelist_image):
 
 
 def extract_data_from_image(image: Image):
+    """extracts rental team data from a screenshot image
+
+    Parameters
+    ----------
+    image: Image
+
+    Returns
+    -------
+    Result
+        Result dataclass containing the raw text data found in the image
+    """
     debug_images = []
     debug_images.append(DebugImage("source", image))
 
@@ -310,7 +304,7 @@ def extract_data_from_image(image: Image):
     team_id = _extract_text(team_id_image)
     logger.info("Extracted Team ID: %s", team_id)
 
-    team = {"id": team_id, "pokemon": []}
+    team = Team(id=team_id, pokemon=[])
 
     movelist_contours.sort(key=lambda m: m[0][0][0] + 10 * m[0][0][1])
 
@@ -333,8 +327,8 @@ def extract_data_from_image(image: Image):
         for move in movelist:
             logger.info("Extracted move: %s", move)
 
-        pokemon = {"species": species, "ability": ability,
-                   "item": item, "movelist": movelist}
+        pokemon = Pokemon(species=species, ability=ability,
+                          item=item, movelist=movelist)
 
         team["pokemon"].append(pokemon)
 

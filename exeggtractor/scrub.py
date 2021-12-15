@@ -1,3 +1,9 @@
+""" scrub.py - "lazy" data scrubbing for exeggtractor extraction results
+
+This module contains the code for scrub_team_data which takes the data returned
+from extract_data_from_image and scrubs it lazily using a known list of
+possible values.
+"""
 import logging
 import re
 from difflib import SequenceMatcher
@@ -11,23 +17,21 @@ ITEMS_FILE = "itemname.txt"
 MOVES_FILE = "wazaname.txt"
 
 
-def read_data_file(filename):
-    """Read file as data points separated by line"""
+def _read_data_file(filename):
     with open(DATA_DIR / filename, "r", encoding="utf8") as file:
         return file.read().splitlines()
 
 
-SPECIES = read_data_file(SPECIES_FILE)
-ABILITIES = read_data_file(ABILITIES_FILE)
-ITEMS = read_data_file(ITEMS_FILE)
-MOVES = read_data_file(MOVES_FILE)
+SPECIES = _read_data_file(SPECIES_FILE)
+ABILITIES = _read_data_file(ABILITIES_FILE)
+ITEMS = _read_data_file(ITEMS_FILE)
+MOVES = _read_data_file(MOVES_FILE)
 
 
 logger = logging.getLogger(__name__)
 
 
 def _get_best_match(needle: str, haystack: List[str]):
-    """Find the most similar string given a list of possibilities"""
     matcher = SequenceMatcher()
     matcher.set_seq2(needle.lower())
     best_ratio = 0
@@ -57,6 +61,14 @@ def _scrub_team_id(raw_id):
 
 
 def scrub_team_data(team):
+    """Scrubs raw team data extracted from extract_data_from_image
+
+    expects a dictionary of the form:
+    {
+        "id": str,
+        "pokemon":
+    }
+    """
     scrubbed_id = _scrub_team_id(team["id"])
 
     scrubbed_pokemon = []

@@ -1,3 +1,7 @@
+""" utils.py - utility tools used in exeggtractor
+
+This module contains some utility functions used in exeggtractor
+"""
 import cv2
 import numpy as np
 
@@ -18,7 +22,7 @@ def order_points(contour):
     return points
 
 
-def distance(a, b):
+def distance(a, b): # pylint: disable=invalid-name
     """Calculate the euclidean distance between 2 points"""
     return np.linalg.norm(a - b)
 
