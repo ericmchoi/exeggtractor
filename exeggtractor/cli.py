@@ -18,32 +18,30 @@ options:
 
 import json
 import logging
-import os
-import pathlib
 import sys
+import os
 from argparse import ArgumentParser
 
-import cv2
-
-from .extract import extract_data_from_image
-from .scrub import scrub_team_data
+from .api import extract_team_from_file
+from .extractor import DebugImageLevel
 
 
 def main():
     """Handle command line usage of this module"""
     parser = ArgumentParser()
     parser.add_argument("image", help="path to image file")
-    parser.add_argument("-v",
-                        "--verbose",
-                        help="enables verbose messages",
-                        action="store_true")
-    parser.add_argument("-o",
-                        "--output_dir",
-                        help="specifies an output directory for debug images")
-    parser.add_argument("-r",
-                        "--raw",
-                        help="disables data scrubbing and returns raw data",
-                        action="store_true")
+    parser.add_argument(
+        "-v", "--verbose", help="enable verbose messages", action="store_true"
+    )
+    parser.add_argument(
+        "-d",
+        "--debug_images",
+        help="set additional debug images to be written",
+        action="store_true",
+    )
+    parser.add_argument(
+        "-o", "--output_dir", help="specify an output directory for debug images"
+    )
     args = parser.parse_args()
 
     if args.verbose:
@@ -51,34 +49,22 @@ def main():
         logger.setLevel(logging.INFO)
 
         console_handler = logging.StreamHandler()
-        console_format = logging.Formatter(
-            "%(asctime)s %(levelname)s %(message)s")
+        console_format = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
 
         console_handler.setFormatter(console_format)
         logger.addHandler(console_handler)
 
-    image = cv2.imread(args.image)
+    debug_image_level = None
+    if args.debug_images:
+        debug_image_level = DebugImageLevel.ALL
 
-    if image is None:
+    try:
+        result = extract_team_from_file(args.image, debug_image_level, args.output_dir)
+    except FileNotFoundError:
         print(f"Could not read image at: {args.image}", file=sys.stderr)
         sys.exit(os.EX_NOINPUT)
 
-    result = extract_data_from_image(image)
-
-    if args.output_dir:
-        output_dir = pathlib.Path(args.output_dir)
-
-        for image in result.debug_images:
-            cv2.imwrite(str(output_dir / f'{image.name}.jpg'), image.image)
-
-    if result.error:
-        print(result.error)
-    else:
-        if args.raw:
-            print(json.dumps(result.team))
-        else:
-            scrubbed_team = scrub_team_data(result.team)
-            print(json.dumps(scrubbed_team))
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":
