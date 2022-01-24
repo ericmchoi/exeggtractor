@@ -313,6 +313,7 @@ class Extractor:
             .reshape((height, width, 1))
             .astype(np.uint8)
         )
+        self._save_image("white-mask", mask, DebugImageLevel.ALL)
 
         # clean up vertical edges
         opening_x = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((25, 5), np.uint8))
