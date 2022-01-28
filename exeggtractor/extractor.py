@@ -178,6 +178,7 @@ class Extractor:
                 .reshape((height, width, 1))
                 .astype(np.uint8)
             )
+            self._save_image(f"color-mask-{color}", color_mask, DebugImageLevel.ALL)
 
             # connected component analysis
             component_count, components, stats, _ = cv2.connectedComponentsWithStats(
@@ -214,6 +215,16 @@ class Extractor:
                         # fill the connected component with a random color
                         color = np.random.randint(0, 255, 3)
                         components_image[components == component] = color
+                        cv2.rectangle(
+                            components_image,
+                            (component_left, component_top),
+                            (
+                                component_left + component_width,
+                                component_top + component_height,
+                            ),
+                            (0, 0, 255),
+                            max(width, height) // 200,
+                        )
 
                         bounding_area = component_width * component_height
                         diff = abs(cv2.contourArea(poly) - bounding_area)
@@ -269,17 +280,24 @@ class Extractor:
         return screen
 
     def _get_screen(self):
-        ratio = max(720 / self.source.shape[0], 1280 / self.source.shape[1])
+        height, width = self.source.shape[:2]
+        ratio = max(720 / height, 1280 / width)
         dsize = (
-            int(ratio * self.source.shape[1]),
-            int(ratio * self.source.shape[0]),
+            int(ratio * width),
+            int(ratio * height),
         )
         resized = cv2.resize(self.source, dsize)
 
         screen_contour = np.int32(self._find_screen_kmeans(resized) / ratio)
 
         source_with_screen = self.source.copy()
-        cv2.drawContours(source_with_screen, [screen_contour], 0, (0, 0, 255), 10)
+        cv2.drawContours(
+            source_with_screen,
+            [screen_contour],
+            0,
+            (0, 0, 255),
+            max(height, width) // 200,
+        )
         self._save_image("source-with-screen", source_with_screen)
 
         screen = crop_fixed_perspective(self.source, screen_contour, (1280, 690))
@@ -642,7 +660,7 @@ class Extractor:
 
             info_contours = [species_contour, ability_contour, item_contour]
             cv2.drawContours(text_regions, info_contours, -1, (0, 0, 255), 2)
-            cv2.drawContours(text_regions, movelist_contours, -1, (0, 0, 255), 2)
+            cv2.drawContours(text_regions, move_contours, -1, (0, 0, 255), 2)
 
             pokemon.append(mon)
             raw_pokemon.append(raw_mon)
