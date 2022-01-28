@@ -118,6 +118,6 @@ result = exeggtractor.extract_team_from_file("./filepath/to/image.jpg")
 print(result)
 ```
 ## Program Overview
-The flowchart below shows a high-level overview of the steps Exeggtractor takes to extract pokemon team information. A more in-depth explanation of the process can be found at [details](details).
+The flowchart below shows a high-level overview of the steps Exeggtractor takes to extract pokemon team information. A more in-depth explanation of the process can be found at [details](DETAILS.md).
 
 ![Overview](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/overview.png?raw=true)
