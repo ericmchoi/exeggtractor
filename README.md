@@ -1,14 +1,14 @@
 # Exeggtractor
 A Pokemon Sword/Shield screenshot analyzer that extracts Pokemon team data.
 
-![Example]()
+![Example](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/example.png?raw=true)
 
 ## Motivation
-Pokemon Sword/Shield provides an easy way for players to share Pokemon rental teams for other players to use via an auto-generated ID in game. Players usually share their teams by generating these IDs and sharing screenshots of them to others.
+Pokemon Sword/Shield provides an easy way for players to share Pokemon rental teams for other players to use via an auto-generated ID in game. Players usually share their teams by uploading screenshots of these generated IDs.
 
 However, there isn't a publicly accessible way to grab the data associated with these team IDs, via an API or otherwise. Furthermore, sharing screenshots is a cumbersome, multi-step process for Nintendo switch games, and users may find it more convenient to take a photo of their screen rather than share a clean screenshot.
 
-This program was written to extract Pokemon rental team information from both screenshots and screen photos.
+This program was written to extract Pokemon rental team information from screenshots and from screen photos with certain limitations.
 
 ## Usage
 ### Prerequisites
@@ -16,27 +16,24 @@ This program was written to extract Pokemon rental team information from both sc
 ```bash
 sudo apt install tesseract-ocr
 ```
-### Installation
+Then you can install Exeggtractor via pip:
 ```bash
-git clone https://github.com/ericmchoi/exeggtractor.git
-cd exeggtractor
-pip install
+pip install git+https://github.com/ericmchoi/exeggtractor.git
 ```
-### Usage
-Exeggtractor can be used both as a command-line tool and a library.
-#### Command-line
+
+### As a command-line tool
 ```
-usage: exeggtract [-h] [-v] [-o OUTPUT_DIR] [-d] image
+usage: exeggtract [-h] [-v] [-d] [-o OUTPUT_DIR] image
 
 positional arguments:
   image                 path to image file
 
 options:
   -h, --help            show this help message and exit
-  -v, --verbose         enables verbose messages
+  -v, --verbose         enable verbose messages
+  -d, --debug_images    set additional debug images to be written
   -o OUTPUT_DIR, --output_dir OUTPUT_DIR
-                        specifies an output directory for debug images
-  -d, --debug_images    sets all debug images to be written
+                        specify an output directory for debug images
 ```
 ##### Example
 ```
@@ -71,7 +68,7 @@ $ exeggtract test.jpg
       "ability": "Defiant",
       "item": "Choice Scarf",
       "movelist": [
-        "Tailwind", 
+        "Tailwind",
         "U-turn",
         "Brave Bird",
         "Close Combat"
@@ -113,10 +110,14 @@ $ exeggtract test.jpg
   ]
 }
 ```
-#### Library
+### As a library
 ```python
-import cv2
-from extractor import Extractor
+import exeggtractor
 
-
+result = exeggtractor.extract_team_from_file("./filepath/to/image.jpg")
+print(result)
 ```
+## Program Overview
+The flowchart below shows a high-level overview of the steps Exeggtractor takes to extract pokemon team information. A more in-depth explanation of the process can be found at [details](details).
+
+![Overview](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/overview.png?raw=true)
