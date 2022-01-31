@@ -33,11 +33,11 @@ Each of the potential candidates is compared to it's bounding rectangular box as
 
 | Name | Image |
 | -- | -- |
-| Original Image |![original image](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/00-source.jpg?raw=true =x320)  |
-| Color Quantized | ![color quantized](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/01-source-quantized.jpg?raw=true =x320) |
-| Color Mask (of blue) | ![color mask](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/03-color-mask-1.jpg?raw=true =x320) |
-| Connected Components (Bounding boxes in red) | ![connected components](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/05-connected-components.jpg?raw=true =x320) |
-| Final Result (Screen is outlined red) | ![final result](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/06-source-with-screen.jpg?raw=true =x320) |
+| Original Image |<img alt="original image" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/00-source.jpg?raw=true" height="320" />  |
+| Color Quantized | <img alt="color quantized" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/01-source-quantized.jpg?raw=true" height="320" /> |
+| Color Mask (of blue) | <img alt="color mask" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/03-color-mask-1.jpg?raw=true" height="320" /> |
+| Connected Components (Bounding boxes in red) | <img alt="connected components" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/05-connected-components.jpg?raw=true" height="320" /> |
+| Final Result (Screen is outlined red) | <img alt="final result" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/06-source-with-screen.jpg?raw=true" height="320" /> |
 
 ### Notes
 
@@ -47,7 +47,7 @@ A more conventional approach to this sort of computer vision problem is to use [
 
 Once the contour of the screen is found, Exeggtractor performs a perspective transform to straighten and crop out the screen into a separate image. At this point, the image should be very similar to a screenshot image.
 
-![final result](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/07-screen.jpg?raw=true =x320)
+<img alt="final result" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/07-screen.jpg?raw=true" height="320" />
 
 ### Notes
 
@@ -63,15 +63,15 @@ Next, a [morphological opening](https://docs.opencv.org/3.4/d9/d61/tutorial_py_m
 
 | Name | Image |
 | -- | -- |
-| Color Quantization | ![screen quantized](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/08-screen-quantized.jpg?raw=true =x320) |
-| Mask of White Pixels | ![Mask of White Pixels](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/09-white-mask.jpg?raw=true =x320) |
-| Opening (Vertical Direction) | ![Vertical Opening](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/10-opening-x.jpg?raw=true =x320)  |
-| Sobel Filter (Vertical) | ![Sobel Filter X](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/11-sobel-x.jpg?raw=true =x320)  |
-| Hough Lines (Vertical) | ![Hough Lines Vertical](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/12-vertical-hough-lines.jpg?raw=true =x320)  |
-| Opening (Horizontal) | ![Horizontal Opening](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/13-opening-y.jpg?raw=true =x320)  |
-| Sobel Filter (Horizontal) | ![Sobel Filter Y](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/14-sobel-y.jpg?raw=true =x320)  |
-| Hough Lines (Horizontal) | ![Hough Lines Horizontal](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/15-horizontal-hough-lines.jpg?raw=true =x320)  |
-| Final Result | ![Final Result](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/16-merged-lines.jpg?raw=true =x320)  |
+| Color Quantization | <img alt="screen quantized" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/08-screen-quantized.jpg?raw=true" height="320" /> |
+| Mask of White Pixels | <img alt="Mask of White Pixels" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/09-white-mask.jpg?raw=true" height="320" /> |
+| Opening (Vertical Direction) | <img alt="Vertical Opening" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/10-opening-x.jpg?raw=true" height="320" />  |
+| Sobel Filter (Vertical) | <img alt="Sobel Filter X" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/11-sobel-x.jpg?raw=true" height="320" />  |
+| Hough Lines (Vertical) | <img alt="Hough Lines Vertical" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/12-vertical-hough-lines.jpg?raw=true" height="320" />  |
+| Opening (Horizontal) | <img alt="Horizontal Opening" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/13-opening-y.jpg?raw=true" height="320" />  |
+| Sobel Filter (Horizontal) | <img alt="Sobel Filter Y" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/14-sobel-y.jpg?raw=true" height="320" />  |
+| Hough Lines (Horizontal) | <img alt="Hough Lines Horizontal" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/15-horizontal-hough-lines.jpg?raw=true" height="320" />  |
+| Final Result | <img alt="Final Result" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/16-merged-lines.jpg?raw=true" height="320" />  |
 
 ### Notes
 
@@ -81,7 +81,7 @@ There is a more straightforward approach that involves taking the mask of the wh
 
 Using the intersection of the lines found above, and with a little geometric extrapolation, each text line can be isolated and cropped.
 
-![enter image description here](https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/72-text-regions.jpg?raw=true =x320)
+<img alt="enter image description here" src="https://github.com/ericmchoi/exeggtractor/blob/assets/doc-images/72-text-regions.jpg?raw=true" height="320" />
 
 These cropped lines are then preprocessed and given to [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) to read text. The extracted text is then matched against a list of known values to produce the final result. If it does not match well enough to any value, the image is preprocessed again with slightly different parameters to try and improve the result of the OCR.
 
